@@ -25,9 +25,12 @@ namespace WebApi.Controllers
 
         // GET api/<UsersController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Employee Get(int id)
         {
-            return "value";
+            using (var db = new UsersContext())
+            {
+                return db.Employees.Where(x => x.Id == id).FirstOrDefault();
+            }
         }
 
         // POST api/<UsersController>
@@ -43,14 +46,28 @@ namespace WebApi.Controllers
 
         // PUT api/<UsersController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody] NewEmployee item)
         {
+            using (var db = new UsersContext())
+            {
+                var updatedEmployee = db.Employees.Where(x=> x.Id == id).FirstOrDefault();
+                updatedEmployee.Fname = item.firstName; 
+                updatedEmployee.Lname = item.lastName;
+                updatedEmployee.Age = item.age;
+                db.SaveChanges();
+            }
         }
 
         // DELETE api/<UsersController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            using (var db = new UsersContext())
+            {
+                var deletedEmployee = db.Employees.Where(x => x.Id == id).FirstOrDefault();
+                db.Employees.Remove(deletedEmployee);
+                db.SaveChanges();
+            }
         }
     }
 }
